@@ -42,10 +42,10 @@
                         @endphp
                         <h2>
                             <span
-                                style="text-decoration: line-through; color: grey; font-size: 1.3rem;">₱{{ number_format($product->price, 2) }}</span>
+                                style="text-decoration: line-through; color: brown; font-size: 1.3rem;">₱{{ number_format($product->price, 2) }}</span>
                             <span style="font-size: 0.8rem; color: green;">-{{ $product->product_discount }}%</span>
                         </h2>
-                        <h2 style="color: brown;"><strong>₱{{ number_format($discounted_price, 2) }}</strong></h2>
+                        <h2><strong>₱{{ number_format($discounted_price, 2) }}</strong></h2>
             @else
                 <h2><strong>₱{{ number_format($product->price, 2) }}</strong></h2>
             @endif
@@ -54,20 +54,24 @@
             <hr>
             <label for="description"><strong>Description:</strong></label>
             <p>{!! nl2br(e($product->description)) !!}</p>
-            <p><strong>Category:</strong> {{ $product->category->type }}</p>
-            <p><strong>Supplier:</strong> {{ $product->supplier->name }}</p>
-            <hr>
-            <a href="{{ route('products.edit', $product->id) }}" class="btn btn-warning mx-2">
-                <i class="bi bi-pencil-square"></i> Edit
-            </a>
-            <form id="delete-form" action="{{ route('products.destroy', $product->id) }}" method="POST"
-                style="display:inline;">
-                @csrf
-                @method('DELETE')
-                <button type="button" class="btn btn-danger mx-2" id="delete-button">
-                    <i class="bi bi-trash3-fill"></i> Delete
-                </button>
-            </form>
+
+            @if(Auth::check() && Auth::user()->userRole->role_id == 1)
+                <p><strong>Category:</strong> {{ $product->category->type }}</p>
+                <p><strong>Supplier:</strong> {{ $product->supplier->name }}</p>
+                <hr>
+                <a href="{{ route('products.edit', $product->id) }}" class="btn btn-warning mx-2">
+                    <i class="bi bi-pencil-square"></i> Edit
+                </a>
+                <form id="delete-form" action="{{ route('products.destroy', $product->id) }}" method="POST"
+                    style="display:inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button" class="btn btn-danger mx-2" id="delete-button">
+                        <i class="bi bi-trash3-fill"></i> Delete
+                    </button>
+                </form>
+            @endif
+
         </div>
     </div>
 
@@ -75,25 +79,27 @@
 </div>
 
 <script>
-    document.getElementById('delete-button').addEventListener('click', function (e) {
-        e.preventDefault();
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('delete-button').addEventListener('click', function (e) {
+            e.preventDefault();
 
-        // Get the product name from the Blade template
-        var product_name = @json($product->product_name);
+            var product_name = @json($product->product_name);
 
-        Swal.fire({
-            title: `Are you sure you want to delete "${product_name}"?`, // Use backticks for template literals
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('delete-form').submit();
-            }
+            Swal.fire({
+                title: `Are you sure you want to delete "${product_name}"?`,
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form').submit();
+                }
+            });
         });
     });
 </script>
+
 @endsection

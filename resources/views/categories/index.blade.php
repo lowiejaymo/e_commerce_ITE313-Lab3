@@ -66,7 +66,7 @@
         <h1 class="mb-0">Categories</h1>
         <a href="{{ route('categories.create') }}" class="btn btn-dark">
             <i class="bi bi-plus-square"></i> 
-            <span class="d-none d-sm-inline">Create New Category</span> <!-- Hidden on small screens -->
+            <span class="d-none d-sm-inline"> Create New Category</span> <!-- Hidden on small screens -->
         </a>
     </div>
 

@@ -67,7 +67,7 @@
         <h1 class="mb-0">Supplier</h1>
         <a href="{{ route('suppliers.create') }}" class="btn btn-dark">
             <i class="bi bi-plus-square"></i>
-            <span class="d-none d-sm-inline">Create New Supplier</span> <!-- Hidden on small screens -->
+            <span class="d-none d-sm-inline"> Create New Supplier</span> <!-- Hidden on small screens -->
         </a>
     </div>
 
@@ -97,12 +97,14 @@
                             <td>{{ $supplier->email }}</td>
                             <td>{{ $supplier->address }}</td>
                             <td>
-                                <a href="{{ route('suppliers.edit', $supplier->supplier_id) }}" class="btn btn-warning btn-sm">Edit</a>
-                                <form id="delete-form-{{ $supplier->supplier_id }}" action="{{ route('suppliers.destroy', $supplier->supplier_id) }}" method="POST" style="display: inline;">
+                            <a href="{{ route('suppliers.supplierInformation', $supplier->supplier_id) }}" class="btn btn-success btn-sm"><i class="bi bi-hand-index-thumb"></i>
+                                    Select
+                                </a>
+                                <!-- <form id="delete-form-{{ $supplier->supplier_id }}" action="{{ route('suppliers.destroy', $supplier->supplier_id) }}" method="POST" style="display: inline;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ $supplier->name }}', {{ $supplier->supplier_id }})">Delete</button>
-                                </form>
+                                </form> -->
                             </td>
                         </tr>
                     @endforeach

@@ -69,8 +69,11 @@ class SupplierController extends Controller
             'email' => $request->input('email'),
         ]);
 
-        return redirect()->route('suppliers.index')->with('update_success', 'Supplier updated successfully!');
+        // Redirect to the supplier information page
+        return redirect()->route('suppliers.supplierInformation', $supplier->supplier_id)
+            ->with('update_success', 'Supplier updated successfully!');
     }
+
 
     public function destroy($id)
     {

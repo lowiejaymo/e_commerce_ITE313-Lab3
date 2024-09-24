@@ -1,9 +1,23 @@
 @extends('layouts.app')
 
 @section('sidebar')
+
+@if (session('deleted_product'))
+    <script>
+        Swal.fire({
+            title: 'Success!',
+            text: '{{ session("deleted_product") }} has been deleted successfully.',
+            icon: 'success'
+        });
+    </script>
+@endif
+
+
+
+
 <div class="card mb-4 d-none d-md-block"> <!-- Sidebar hidden on smaller screens -->
     <div class="card-header">
-        <h5>Filters</h5>
+        <h5><strong>Filters</strong></h5>
     </div>
     <div class="card-body">
         <form action="{{ route('products.index') }}" method="GET">
@@ -36,13 +50,14 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Products</h1>
-        <a href="{{ route('products.create') }}" class="btn btn-dark d-flex align-items-center">
-            <i class="bi bi-plus-square"></i>
-            <span class="d-none d-md-inline ms-2">Create New Product</span>
-        </a>
+        @if(Auth::check() && Auth::user()->userRole && Auth::user()->userRole->role_id == 1)
+            <a href="{{ route('products.create') }}" class="btn btn-dark d-flex align-items-center">
+                <i class="bi bi-plus-square"></i>
+                <span class="d-none d-md-inline ms-2">Create New Product</span>
+            </a>
+        @endif
     </div>
 
-    <!-- Search Bar in Desktop View -->
     <div class="d-none d-md-block mb-3">
         <form action="{{ route('products.index') }}" method="GET" class="w-100">
             <div class="input-group">
@@ -55,25 +70,20 @@
         </form>
     </div>
 
-    <!-- Mobile Toggle for Filters and Search -->
     <div class="d-md-none mb-3">
-        <!-- Button for toggling filters -->
         <button class="btn btn-light w-100 mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#mobileFilters"
             aria-expanded="false" aria-controls="mobileFilters">
             <i class="bi bi-filter"></i> Show Filters
         </button>
-        <!-- Button for toggling search -->
         <button class="btn btn-light w-100" type="button" data-bs-toggle="collapse" data-bs-target="#mobileSearch"
             aria-expanded="false" aria-controls="mobileSearch">
             <i class="bi bi-search-heart"></i> Search Product
         </button>
     </div>
 
-    <!-- Collapsible Mobile Filters -->
     <div class="collapse mb-4" id="mobileFilters">
         <div class="card card-body">
             <form action="{{ route('products.index') }}" method="GET">
-                <!-- Category Filter -->
                 <div class="mb-3">
                     <h6>Category</h6>
                     @foreach($categories as $category)
@@ -85,7 +95,6 @@
                     @endforeach
                 </div>
 
-                <!-- Price Filter -->
                 <div class="mb-3">
                     <h6>Price</h6>
                     <input type="number" name="min_price" class="form-control mb-2" placeholder="Min price"
@@ -94,13 +103,11 @@
                         value="{{ request('max_price') }}">
                 </div>
 
-                <!-- Apply Filters Button -->
                 <button type="submit" class="btn btn-dark w-100">Apply Filters</button>
             </form>
         </div>
     </div>
 
-    <!-- Collapsible Mobile Search -->
     <div class="collapse mb-4" id="mobileSearch">
         <div class="card card-body">
             <form action="{{ route('products.index') }}" method="GET" class="w-100">
@@ -140,7 +147,6 @@
             </script>
         @endif
 
-        <!-- Product Grid -->
         <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
             @foreach($products as $product)
                 <div class="col">
@@ -167,11 +173,12 @@
                                                 @endphp
                                                 <h4 class="text-left">
                                                     <span
-                                                        style="text-decoration: line-through; color: grey; font-size: 1.3rem;">₱{{ number_format($product->price, 2) }}</span>
+                                                        style="text-decoration: line-through; color: brown; font-size: 1.3rem;">₱{{ number_format($product->price, 2) }}</span>
                                                     <span style="font-size: 0.8rem; color: green;">-{{ $product->product_discount }}%</span>
                                                 </h4>
-                                                <h4 class="text-left" style="color: brown; margin-top: 5px;">
-                                                    <strong>₱{{ number_format($discounted_price, 2) }}</strong></h4>
+                                                <h4 class="text-left" style=" margin-top: 5px;">
+                                                    <strong>₱{{ number_format($discounted_price, 2) }}</strong>
+                                                </h4>
                                 @else
                                     <h4 class="text-left"><strong>₱{{ number_format($product->price, 2) }}</strong></h4>
                                 @endif

@@ -45,7 +45,8 @@
                 </div>
                 <div class="form-group mt-3 d-flex justify-content-center">
                     <button type="submit" class="btn btn-primary me-2">Update</button>
-                    <a type="button" href="{{ route('suppliers.index') }}" class="btn btn-secondary">Cancel</a>
+                    <a type="button" href="{{ route('suppliers.supplierInformation', $supplier->supplier_id) }}" class="btn btn-secondary">Cancel</a>
+
                 </div>
             </form>
 

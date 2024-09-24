@@ -11,50 +11,50 @@ use Illuminate\Support\Facades\Storage;
 class ProductController extends Controller
 {
     public function index(Request $request)
-{
-    $categories = Category::select('category_id', 'type')->get();
-    $products = Product::query();
+    {
+        $categories = Category::select('category_id', 'type')->get();
+        $products = Product::query();
 
-    // Filter by categories if selected
-    if ($request->has('categories') && is_array($request->input('categories'))) {
-        $categoryIds = array_filter(array_map('intval', $request->input('categories')));
-        if (!empty($categoryIds)) {
-            $products->whereIn('category_id', $categoryIds);
+        // Filter by categories if selected
+        if ($request->has('categories') && is_array($request->input('categories'))) {
+            $categoryIds = array_filter(array_map('intval', $request->input('categories')));
+            if (!empty($categoryIds)) {
+                $products->whereIn('category_id', $categoryIds);
+            }
         }
+
+        // Handle minimum price filter
+        if ($request->has('min_price') && is_numeric($request->input('min_price'))) {
+            $minPrice = $request->input('min_price');
+            $products->where(function ($query) use ($minPrice) {
+                $query->whereRaw('price - (price * product_discount / 100) >= ?', [$minPrice])
+                    ->orWhere('price', '>=', $minPrice); // Include original price if no discount
+            });
+        }
+
+        // Handle maximum price filter
+        if ($request->has('max_price') && is_numeric($request->input('max_price'))) {
+            $maxPrice = $request->input('max_price');
+            $products->where(function ($query) use ($maxPrice) {
+                $query->whereRaw('price - (price * product_discount / 100) <= ?', [$maxPrice])
+                    ->orWhere('price', '<=', $maxPrice); // Include original price if no discount
+            });
+        }
+
+        // Handle search functionality
+        if ($request->has('search') && !empty($request->input('search'))) {
+            $searchTerm = $request->input('search');
+            $products->where('product_name', 'like', '%' . $searchTerm . '%');
+        }
+
+        // Fetch products
+        $products = $products->get();
+
+        return view('products.index', [
+            'categories' => $categories,
+            'products' => $products,
+        ]);
     }
-
-    // Handle minimum price filter
-    if ($request->has('min_price') && is_numeric($request->input('min_price'))) {
-        $minPrice = $request->input('min_price');
-        $products->where(function ($query) use ($minPrice) {
-            $query->whereRaw('price - (price * product_discount / 100) >= ?', [$minPrice])
-                  ->orWhere('price', '>=', $minPrice); // Include original price if no discount
-        });
-    }
-
-    // Handle maximum price filter
-    if ($request->has('max_price') && is_numeric($request->input('max_price'))) {
-        $maxPrice = $request->input('max_price');
-        $products->where(function ($query) use ($maxPrice) {
-            $query->whereRaw('price - (price * product_discount / 100) <= ?', [$maxPrice])
-                  ->orWhere('price', '<=', $maxPrice); // Include original price if no discount
-        });
-    }
-
-    // Handle search functionality
-    if ($request->has('search') && !empty($request->input('search'))) {
-        $searchTerm = $request->input('search');
-        $products->where('product_name', 'like', '%' . $searchTerm . '%');
-    }
-
-    // Fetch products
-    $products = $products->get();
-
-    return view('products.index', [
-        'categories' => $categories,
-        'products' => $products,
-    ]);
-}
 
 
     public function create()
@@ -92,7 +92,8 @@ class ProductController extends Controller
             'price' => $request->input('price'),
             'product_discount' => $request->input('product_discount'),
             'stock' => $request->input('stock'),
-            'description' => $request->input('description'),
+            // Set description to null if it is an empty string
+            'description' => $request->input('description') ?: null,
             'product_image' => $imageName,
             'supplier_id' => $request->input('supplier_id'),
             'category_id' => $request->input('category_id'),
@@ -100,6 +101,7 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')->with('success_product_added', $product->product_name);
     }
+
 
 
 
@@ -159,12 +161,11 @@ class ProductController extends Controller
         return redirect()->route('products.show', $product->id)->with('update_product_information', 'Product information has been updated successfully.');
     }
 
-    public function destroy(string $id)
+    public function destroy($id)
     {
         $product = Product::findOrFail($id);
-        $product_name = $product->product_name;
         $product->delete();
 
-        return redirect()->route('products.index')->with('deleted_product', $product_name);
+        return redirect()->route('products.index')->with('deleted_product', $product->product_name);
     }
 }

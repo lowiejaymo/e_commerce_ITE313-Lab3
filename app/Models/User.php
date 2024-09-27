@@ -35,12 +35,10 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
-
     public function userRole()
     {
-        return $this->hasOne(UserRole::class, 'user_id');
+        return $this->hasOne(UserRole::class, 'user_id', 'id');
     }
-
 
 
     public function isAdmin()

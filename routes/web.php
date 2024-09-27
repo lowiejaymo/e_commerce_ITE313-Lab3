@@ -29,7 +29,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('password.update');
 });
 
-Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(function () {
+Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/manageUsers', [AdminController::class, 'index'])->name('admin.manageUsers');
     Route::get('/admin/userInformation', [AdminController::class, 'userInformation'])->name('admin.userInformation');
 
@@ -39,9 +39,7 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(
     Route::resource('suppliers', SupplierController::class);
     Route::get('/suppliers/supplierInformation/{id}', [AdminController::class, 'supplierInformation'])->name('suppliers.supplierInformation');
 
-    Route::get('products/{id}/edit', [ProductController::class, 'edit'])->middleware('admin');
-    Route::get('products/{id}/edit', [ProductController::class, 'edit'])->middleware(['auth', 'admin']);
-
+    Route::get('products/{id}/edit', [ProductController::class, 'edit']);
 
     Route::resource('admin', AdminController::class);
     Route::get('/admin/userInformation/{id}', [AdminController::class, 'userInformation'])->name('admin.userInformation');

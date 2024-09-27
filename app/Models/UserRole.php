@@ -25,9 +25,4 @@ class UserRole extends Model
     {
         return $this->belongsTo(Role::class);
     }
-    public function userRole()
-    {
-        return $this->hasOne(UserRole::class, 'user_id');
-    }
-
 }
